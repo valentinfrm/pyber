@@ -17,5 +17,5 @@ def test_poly_mul_kyber():
     expected = list((f * g).coeffs)
     p1 = poly(coeffs1)
     p2 = poly(coeffs2)
-    result = p1.poly_mul(p2)
+    result = p1 * p2
     assert result.coeff == expected
