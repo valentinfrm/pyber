@@ -25,14 +25,13 @@ def byte_encode(d, int_input):
 
     Args:
         d (int): bits per coeff
-        int_input (list): 256 integers 
+        int_input (list): integers to encode
     
     Returns:
-        bytes: 32 * d bytes
+        bytes: len(int_input) * d / 8 bytes
     """
     bits = []
-    for i in range (params.n):
-        value = int_input[i]
+    for value in int_input:
         for _ in range(d):
             bits.append(value % 2) # always LSB
             value = value >> 1
@@ -48,15 +47,13 @@ def byte_decode(d, byte_input):
         byte_input (list): 32 * d bytes
     
     Returns:
-        list: 256 integers
+        list: integers
     """
     bits = bytes_to_bits(byte_input)
     
     integers = []
-    i = 0
-    while i < len(bits):
-        int_value = sum(bits[i + j] * 2**j for j in range(d))
+    for i in range(0, len(bits), d): # 0 -> len(bits), d = step size
+        int_value = sum(bits[i + j] << j for j in range(d))
         integers.append(int_value)
-        i = i + d
     
     return integers
