@@ -1,7 +1,7 @@
-from hash import G,PRF
+from hash import G, PRF
+from sampling import sample_poly_cbd, expand
 from polynomial import poly
 import params
-import sampling
 import auxiliary
 
 def pke_keygen(d):
@@ -16,19 +16,19 @@ def pke_keygen(d):
     """
 
     rho, sigma = G(d + bytes([params.k]))
-    A = sampling.expand(rho)
+    A = expand(rho)
     N = 0
 
     # generate s
     s = []
     for _ in range(params.k):
-        s.append(sampling.sample_poly_cbd(PRF(params.eta1, sigma, N), params.eta1))
+        s.append(sample_poly_cbd(PRF(params.eta1, sigma, N), params.eta1))
         N += 1
 
     #generate e
     e = []
     for _ in range(params.k):
-        e.append(sampling.sample_poly_cbd(PRF(params.eta1, sigma, N), params.eta1))
+        e.append(sample_poly_cbd(PRF(params.eta1, sigma, N), params.eta1))
         N += 1
 
     # A * s
@@ -50,16 +50,61 @@ def pke_keygen(d):
     s_coeff = [c for p in s for c in p.coeff]
 
     # encode keys
-    ek = auxiliary.byte_encode(12, t_coeff) + rho
-    dk = auxiliary.byte_encode(12, s_coeff)
+    ek = auxiliary.byte_encode(t_coeff, 12) + rho
+    dk = auxiliary.byte_encode(s_coeff, 12)
 
     return (ek, dk)
 
+def encrypt(ek, m, r):
+    rho = ek[-32:]
+    t = auxiliary.byte_decode(ek[:-32], 12)
 
-def transpose_matrix(A):
-    k = len(A)
-    A_t = [[None] * k for _ in range(k)]
-    for row in range(k):
-        for col in range(k):
-            A_t[col][row] = A[row][col]
-    return A_t
+    t_polys = [] # vector of length k with polynomials with n coeff
+    for i in range(params.k):
+        p = t[i * params.n:(i + 1) * params.n]
+        t_polys.append(poly(p))
+    
+    A_t = auxiliary.transpose_matrix(expand(rho))
+    N = 0
+    
+    # sample y vector
+    y = []
+    for _ in range(params.k):
+        y.append(sample_poly_cbd(PRF(params.eta1, r, N), params.eta1))
+        N += 1
+
+    # sample e1 vector
+    e1 = []
+    for _ in range(params.k):
+        e1.append(sample_poly_cbd(PRF(params.eta2, r, N), params.eta2))
+        N += 1
+
+    # sample e2 polynomial
+    e2 = sample_poly_cbd(PRF(params.eta2, r, N), params.eta2)
+
+    # u = (A_t * y) + e1
+    u = [] # vector of polys length k
+    for row in range(params.k):
+        p = poly([0] * params.n) # poly with only 0s as coeff
+        for col in range(params.k):
+            p += A_t[row][col] * y[col]
+        p += e1[row]
+        u.append(p)
+
+    mu = poly(auxiliary.decompress_poly(auxiliary.byte_decode(m, 1), 1))
+    
+    # v = (t^T * y) + e2 + mu
+    v = poly([0] * params.n) # just one poly because of dot product
+    for i in range(params.k):
+        v += (t_polys[i] * y[i])
+    v += e2
+    v += mu
+        
+    c1 = b""
+    for i in range(params.k):
+        uc = auxiliary.compress_poly(u[i].coeff, params.du)
+        c1 += auxiliary.byte_encode(uc, params.du)
+
+    c2 = auxiliary.byte_encode(auxiliary.compress_poly(v.coeff, params.dv), params.dv)
+    
+    return c1 + c2
