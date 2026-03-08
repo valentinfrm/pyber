@@ -4,6 +4,8 @@ from polynomial import poly
 import params
 import auxiliary
 
+#ek, dk PKE keys, not KEM encaps/decaps keys
+
 def pke_keygen(d):
     """
     generates public and private key
@@ -11,8 +13,8 @@ def pke_keygen(d):
     Args:
         d (bytes): 32 byte random seed
     Returns:
-        ek (list): public encapsulation key
-        dk (list): private decapsulation key
+        ek (list): encryption key -> coeff of t + rho
+        dk (list): decryption key -> coeff of s
     """
 
     rho, sigma = G(d + bytes([params.k]))
@@ -56,6 +58,17 @@ def pke_keygen(d):
     return (ek, dk)
 
 def encrypt(ek, m, r):
+    """
+    encrypts a message using the encryption key :)
+    
+    Args:
+        ek (bytes): coeff of t + rho
+        m (bytes): 32 byte message
+        r (bytes): 32 byte random seed for PRF
+
+    Returns:
+        c (bytes): coeffs of u and v poly(s) -> (k * n * du + n * dv) / 8 bytes
+    """
     rho = ek[-32:]
     t = auxiliary.byte_decode(ek[:-32], 12)
 
@@ -64,7 +77,7 @@ def encrypt(ek, m, r):
         p = t[i * params.n:(i + 1) * params.n]
         t_polys.append(poly(p))
     
-    A_t = auxiliary.transpose_matrix(expand(rho))
+    A_T = auxiliary.transpose_matrix(expand(rho))
     N = 0
     
     # sample y vector
@@ -87,7 +100,7 @@ def encrypt(ek, m, r):
     for row in range(params.k):
         p = poly([0] * params.n) # poly with only 0s as coeff
         for col in range(params.k):
-            p += A_t[row][col] * y[col]
+            p += A_T[row][col] * y[col]
         p += e1[row]
         u.append(p)
 
@@ -108,3 +121,41 @@ def encrypt(ek, m, r):
     c2 = auxiliary.byte_encode(auxiliary.compress_poly(v.coeff, params.dv), params.dv)
     
     return c1 + c2
+
+def decrypt(dk, c):
+    """
+    decrypts the ciphertext to retrieve the message
+    by retrieving polys + calculating v - (s^T * u)
+    
+    Args:
+        dk (list): coeffs of k polys appended -> k * n * 12 / 8 bytes
+        c (bytes): coeffs of u and v poly(s) -> (k * n * du + n * dv) / 8 bytes
+
+    Returns:
+        m (bytes): decrypted 32 byte message
+    """
+    c1 = c[0:32*params.du*params.k]
+    c2 = c[32*params.du*params.k:]
+
+    u = []
+    for i in range(params.k):
+        tmp = auxiliary.byte_decode(c1[i * params.n * params.du // 8:(i + 1) * params.n * params.du // 8], params.du) # n coeff with du bits
+        u.append(poly(auxiliary.decompress_poly(tmp, params.du)))
+    
+    v = poly(auxiliary.decompress_poly(auxiliary.byte_decode(c2, params.dv), params.dv))
+
+    s = []
+    for i in range(params.k):
+        tmp = auxiliary.byte_decode(dk[i * params.n * 12 // 8:(i + 1) * params.n * 12 // 8], 12) # *12 because 12 bits per coeff
+        s.append(poly(tmp))
+    
+    # s^T * u
+    sT = poly([0] * params.n)
+    for i in range(params.k):
+        sT += (s[i] * u[i])
+    
+    w = v - sT
+
+    m = auxiliary.byte_encode(auxiliary.compress_poly(w.coeff, 1), 1)
+
+    return m
