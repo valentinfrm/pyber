@@ -6,15 +6,15 @@ import auxiliary
 
 #ek, dk PKE keys, not KEM encaps/decaps keys
 
-def pke_keygen(d):
+def keygen(d):
     """
     generates public and private key
 
     Args:
         d (bytes): 32 byte random seed
     Returns:
-        ek (list): encryption key -> coeff of t + rho
-        dk (list): decryption key -> coeff of s
+        ek (bytes): encryption key -> coeff of t + rho
+        dk (bytes): decryption key -> coeff of s
     """
 
     rho, sigma = G(d + bytes([params.k]))
