@@ -108,14 +108,10 @@ def encaps_check(ek):
         raise ValueError("encaps: modulus check failed")
     
 def decaps_check(dk, c):
-    # c type check
-    if type(c) != bytes:
-        raise TypeError("decaps: c is not of type bytes")
+    _dk_check(dk)
+    _c_check(c)
     
-    # c length check
-    if len(c) != 32 * (params.du * params.k + params.dv):
-        raise ValueError("decaps: c length is not matching")
-
+def _dk_check(dk):
     # dk type check
     if type(dk) != bytes:
         raise TypeError("decaps: dk is not of type bytes")
@@ -129,3 +125,12 @@ def decaps_check(dk, c):
     if test != dk[768 * params.k + 32:768 * params.k + 64]:
         raise ValueError("decaps: H is not digesting the correct hash")
     
+    
+def _c_check(c):
+    # c type check
+    if type(c) != bytes:
+        raise TypeError("decaps: c is not of type bytes")
+    
+    # c length check
+    if len(c) != 32 * (params.du * params.k + params.dv):
+        raise ValueError("decaps: c length is not matching")
