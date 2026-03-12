@@ -1,5 +1,4 @@
 import sampling
-from kyber_py.polynomials.polynomials import PolynomialRing
 from kyber_py.kyber.kyber import Kyber
 import params 
 
