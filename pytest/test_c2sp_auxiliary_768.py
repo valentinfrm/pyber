@@ -212,3 +212,12 @@ def test_bits_to_bytes():
     expected_bytes = [0x0d, 0x00, 0x0d]
     result = bits_to_bytes(test_bits)
     assert result == expected_bytes
+
+def test_encode_decode_roundtrip():
+    data = [1] * 256
+    encoded = byte_encode(data, 12)
+    decoded = byte_decode(encoded, 12)
+
+    print(len(decoded))   # nur zum Debuggen
+    assert len(decoded) == 256
+    assert decoded == data
