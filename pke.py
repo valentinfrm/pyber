@@ -18,7 +18,7 @@ def keygen(d):
         dk (bytes): decryption key -> coeff of s
     """
 
-    rho, sigma = G(d) #+ bytes([params.k])) Wwhy does it work now???
+    rho, sigma = G(d + bytes([params.k]))
     A = expand(rho)
     N = 0
 
