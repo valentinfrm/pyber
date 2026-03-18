@@ -1,25 +1,5 @@
 import params
 
-def bytes_to_bits(byte_array):
-    #LSB first
-    result = []
-    for b in byte_array:
-        for _ in range(8):
-            result.append(b & 1) # LSB
-            b = b >> 1
-    return result
-
-def bits_to_bytes(bit_array):
-    #LSB first
-    result = []
-    for i in range(len(bit_array) // 8): # cuts off remaining bits if len(bit_array) % 8 != 0
-        x = 0
-        for j in range(8):
-            x += bit_array[i * 8 + j] * 2**j
-        result.append(x)
-    return result
-
-
 def byte_encode(int_input, d):
     """
     encodes a list of integers into a list of bytes
@@ -39,7 +19,6 @@ def byte_encode(int_input, d):
     int_full |= int_input[0]
     
     return int_full.to_bytes(n // 8 * d, "little")
-
 
 def byte_decode(byte_input, d):
     """
