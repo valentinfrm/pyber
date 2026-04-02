@@ -1,5 +1,5 @@
-from ntt import mul_NTT
-import params
+from pyber.ntt import mul_NTT
+from pyber import params
 
 class poly:
     """Polynomial in Rq = Zq[x]/(x^n + 1)"""

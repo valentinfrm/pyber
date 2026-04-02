@@ -1,9 +1,9 @@
 import pytest
 
 from c2sp_vectors import ALL_KEM_DATA, KEM_IDS
-from hash import PRF
-import params
-from sampling import expand, sample_poly_cbd
+from pyber.hash import PRF
+from pyber import params
+from pyber.sampling import expand, sample_poly_cbd
 
 @pytest.mark.parametrize("kem_data", ALL_KEM_DATA, ids=KEM_IDS, indirect=True) # indirect -> send to fixture first
 def test_expand(kem_data): # return of fixture

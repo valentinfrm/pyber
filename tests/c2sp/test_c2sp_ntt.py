@@ -1,7 +1,7 @@
 import pytest
 
 from c2sp_vectors import ALL_KEM_DATA, KEM_IDS
-from ntt import NTT, iNTT
+from pyber.ntt import NTT, iNTT
 
 @pytest.mark.parametrize("kem_data", ALL_KEM_DATA, ids=KEM_IDS, indirect=True)
 def test_ntt_s0_768(kem_data):

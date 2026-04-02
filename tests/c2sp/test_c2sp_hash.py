@@ -1,7 +1,7 @@
 import pytest
 
 from c2sp_vectors import ALL_KEM_DATA, KEM_IDS
-from hash import G, H, J
+from pyber.hash import G, H, J
 
 @pytest.mark.parametrize("kem_data", ALL_KEM_DATA, ids=KEM_IDS, indirect=True)
 def test_G(kem_data):

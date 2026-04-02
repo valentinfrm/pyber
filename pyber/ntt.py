@@ -1,4 +1,4 @@
-import params
+from pyber import params
 
 # TODO: fully grasp concepts
 

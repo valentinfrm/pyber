@@ -1,4 +1,4 @@
-import params
+from pyber import params
 
 def byte_encode(int_input, d):
     """

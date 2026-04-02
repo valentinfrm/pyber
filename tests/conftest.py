@@ -1,6 +1,7 @@
-# pytest configuration: adds root directory to Python path for module discovery
-import params
+# pytest fixtures for ML-KEM parameterized tests
 import pytest
+
+from pyber import params
 
 @pytest.fixture()
 def kem_data(request):

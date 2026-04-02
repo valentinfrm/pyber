@@ -1,8 +1,10 @@
-import pke
-import hash
-import params
 import secrets
-import auxiliary as ax
+
+from pyber.auxiliary import byte_encode, byte_decode
+from pyber import hash
+from pyber import params
+from pyber import pke
+
 
 def _keygen_internal(d, z):
     ek_pke, dk_pke = pke.keygen(d)
@@ -103,7 +105,7 @@ def encaps_check(ek):
         raise ValueError("encaps: ek length is not matching")
     
     # modulus check: ensures coeffs are in valid range [0, q-1]
-    test = ax.byte_encode(ax.byte_decode(ek[0:384 * params.k], 12), 12)
+    test = byte_encode(byte_decode(ek[0:384 * params.k], 12), 12)
     if test != ek[0:384 * params.k]:
         raise ValueError("encaps: modulus check failed")
     

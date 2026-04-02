@@ -1,9 +1,9 @@
-from hash import G, PRF
-from sampling import sample_poly_cbd, expand
-from polynomial import poly
-import params
-import auxiliary
-from ntt import NTT, iNTT
+import pyber.auxiliary as ax
+from pyber.hash import G, PRF
+from pyber.ntt import NTT, iNTT
+from pyber import params
+from pyber.polynomial import poly
+from pyber.sampling import sample_poly_cbd, expand
 
 #ek, dk PKE keys, not KEM encaps/decaps keys
 
@@ -63,8 +63,8 @@ def keygen(d):
     s_hat_coeff = [c for p in s_hat for c in p.coeff]
 
     # encode keys
-    ek = auxiliary.byte_encode(t_hat_coeff, 12) + rho
-    dk = auxiliary.byte_encode(s_hat_coeff, 12)
+    ek = ax.byte_encode(t_hat_coeff, 12) + rho
+    dk = ax.byte_encode(s_hat_coeff, 12)
 
     return ek, dk
 
@@ -81,14 +81,14 @@ def encrypt(ek, m, r):
         c (bytes): coeffs of u and v poly(s) -> (k * n * du + n * dv) / 8 bytes
     """
     rho = ek[-32:]
-    t = auxiliary.byte_decode(ek[:-32], 12)
+    t = ax.byte_decode(ek[:-32], 12)
 
     t_polys = [] # vector of length k with polynomials with n coeff
     for i in range(params.k):
         p = t[i * params.n:(i + 1) * params.n]
         t_polys.append(poly(p))
     
-    A_T = auxiliary.transpose_matrix(expand(rho))
+    A_T = ax.transpose_matrix(expand(rho))
     N = 0
     
     # sample y vector
@@ -120,7 +120,7 @@ def encrypt(ek, m, r):
         p = poly(iNTT(p.coeff)) + e1[row]
         u.append(p)
 
-    mu = poly(auxiliary.decompress_poly(auxiliary.byte_decode(m, 1), 1))
+    mu = poly(ax.decompress_poly(ax.byte_decode(m, 1), 1))
     
     # v = (t^T * y) + e2 + mu
     v = poly([0] * params.n) # just one poly because of dot product
@@ -130,10 +130,10 @@ def encrypt(ek, m, r):
         
     c1 = b""
     for i in range(params.k):
-        uc = auxiliary.compress_poly(u[i].coeff, params.du)
-        c1 += auxiliary.byte_encode(uc, params.du)
+        uc = ax.compress_poly(u[i].coeff, params.du)
+        c1 += ax.byte_encode(uc, params.du)
 
-    c2 = auxiliary.byte_encode(auxiliary.compress_poly(v.coeff, params.dv), params.dv)
+    c2 = ax.byte_encode(ax.compress_poly(v.coeff, params.dv), params.dv)
     
     return c1 + c2
 
@@ -154,14 +154,14 @@ def decrypt(dk, c):
 
     u = []
     for i in range(params.k):
-        tmp = auxiliary.byte_decode(c1[i * params.n * params.du // 8:(i + 1) * params.n * params.du // 8], params.du) # n coeff with du bits
-        u.append(poly(auxiliary.decompress_poly(tmp, params.du)))
+        tmp = ax.byte_decode(c1[i * params.n * params.du // 8:(i + 1) * params.n * params.du // 8], params.du) # n coeff with du bits
+        u.append(poly(ax.decompress_poly(tmp, params.du)))
     
-    v = poly(auxiliary.decompress_poly(auxiliary.byte_decode(c2, params.dv), params.dv))
+    v = poly(ax.decompress_poly(ax.byte_decode(c2, params.dv), params.dv))
 
     s = []
     for i in range(params.k):
-        tmp = auxiliary.byte_decode(dk[i * params.n * 12 // 8:(i + 1) * params.n * 12 // 8], 12) # *12 because 12 bits per coeff
+        tmp = ax.byte_decode(dk[i * params.n * 12 // 8:(i + 1) * params.n * 12 // 8], 12) # *12 because 12 bits per coeff
         s.append(poly(tmp))
     
     # s^T * u
@@ -171,6 +171,6 @@ def decrypt(dk, c):
     
     w = v - poly(iNTT(sT.coeff))
 
-    m = auxiliary.byte_encode(auxiliary.compress_poly(w.coeff, 1), 1)
+    m = ax.byte_encode(ax.compress_poly(w.coeff, 1), 1)
 
     return m

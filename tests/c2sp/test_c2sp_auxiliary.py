@@ -1,12 +1,12 @@
 import pytest
 
-from auxiliary import (
+from c2sp_vectors import ALL_KEM_DATA, KEM_IDS
+from pyber.auxiliary import (
     compress_poly, decompress_poly,
     byte_encode, byte_decode,
     transpose_matrix
 )
-from c2sp_vectors import ALL_KEM_DATA, KEM_IDS
-import params
+from pyber import params
 
 @pytest.mark.parametrize("kem_data", ALL_KEM_DATA, ids=KEM_IDS, indirect=True)
 def test_compress_poly_u(kem_data):

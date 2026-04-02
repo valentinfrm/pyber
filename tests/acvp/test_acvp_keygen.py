@@ -1,11 +1,12 @@
 import json
-import kem
-import params
+
 from kyber_py.ml_kem import ML_KEM_512
-from hash import PRF, G
-from ntt import NTT
-from auxiliary import byte_encode
-from sampling import sample_poly_cbd
+
+from pyber.hash import PRF, G
+from pyber import kem
+from pyber.ntt import NTT
+from pyber import params
+from pyber.sampling import sample_poly_cbd
 
 k_map = {
     "ML-KEM-512":  {"k": 2, "eta1": 3, "du": 10, "dv": 4},
@@ -13,10 +14,10 @@ k_map = {
     "ML-KEM-1024": {"k": 4, "eta1": 2, "du": 11, "dv": 5},
 }
 
-with open("pytest/keygen_prompt.json") as f:
+with open("tests/acvp/keygen_prompt.json") as f:
     input = json.load(f)
 
-with open("pytest/keygen_expectedResults.json") as f:
+with open("tests/acvp/keygen_expectedResults.json") as f:
     expectedResults = json.load(f)
 
 expected = {}

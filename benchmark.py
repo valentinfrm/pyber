@@ -1,7 +1,9 @@
 import timeit
-import params
-from kem import keygen, encaps, decaps
+
 from kyber_py.ml_kem import ML_KEM_512, ML_KEM_768, ML_KEM_1024
+
+from pyber import params
+from pyber.kem import keygen, encaps, decaps
 
 k_map = {
     "ML-KEM-512":  {"k": 2, "eta1": 3, "du": 10, "dv": 4},

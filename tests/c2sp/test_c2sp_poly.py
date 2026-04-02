@@ -1,10 +1,10 @@
 import pytest
 
-from auxiliary import byte_decode, byte_encode
 from c2sp_vectors import ALL_KEM_DATA, KEM_IDS
-from ntt import NTT
-import params
-from polynomial import poly
+from pyber.auxiliary import byte_decode, byte_encode
+from pyber.ntt import NTT
+from pyber import params
+from pyber.polynomial import poly
 
 @pytest.mark.parametrize("kem_data", ALL_KEM_DATA, ids=KEM_IDS, indirect=True)
 def test_poly_mul(kem_data):

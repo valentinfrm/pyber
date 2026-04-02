@@ -1,6 +1,7 @@
 import json
-import kem
-import params
+
+from pyber import kem
+from pyber import params
 
 k_map = {
     "ML-KEM-512":  {"k": 2, "eta1": 3, "du": 10, "dv": 4},
@@ -8,10 +9,10 @@ k_map = {
     "ML-KEM-1024": {"k": 4, "eta1": 2, "du": 11, "dv": 5},
 }
 
-with open("pytest/caps_prompt.json") as f:
+with open("tests/acvp/caps_prompt.json") as f:
     input = json.load(f)
 
-with open("pytest/caps_expectedResults.json") as f:
+with open("tests/acvp/caps_expectedResults.json") as f:
     expected_results = json.load(f)
 
 expected = {}

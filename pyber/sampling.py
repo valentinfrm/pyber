@@ -1,8 +1,7 @@
 from Crypto.Hash import SHAKE128
 
-from auxiliary import *
-import params
-from polynomial import poly
+from pyber import params
+from pyber.polynomial import poly
 
 def sample_poly_cbd(byte_input, eta):
     """
