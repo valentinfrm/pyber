@@ -7,25 +7,16 @@ import numpy as np
 from pyber import params
 from pyber.kem import keygen, encaps, decaps
 
-RUN_AMOUNT = 20
+RUN_AMOUNT = 1
 
-color_1 = "#DCD6F7"
-color_2 = "#424874"
-color_3 = "#2ecc71"
-color_4 = "#e74c3c"
-color_5 = "#00b4d8"
-color_6 = "#ef233c"
-color_7 = "#212121"
-color_8 = "#7192ED"
-color_9 = "#C7DD4C"
-color_10 = "#14591D"
-color_11 = "#0a3082"
-color_12 = "#fa3a24"
-color_13 = "#ff9db9"
-color_14 = "#2b4273"
-color_15 = "#3B83FF"
-color_16 = "#B0C9FF"
-color_17 = "#CCDCFF"
+GREEN_LIGHT = "#E5FF54"
+GREEN_DARK = "#1C812A"
+
+BLUE_LIGHT = "#BBD0FE"
+BLUE_DARK = "#3B83FF"
+
+RED_LIGHT = "#fd6969"
+RED_DARK = "#f51827"
 
 k_map = {
     "ML-KEM-512":  {"k": 2, "eta1": 3, "du": 10, "dv": 4},
@@ -113,36 +104,39 @@ def plot(op, ax):
     versions = ["512 Bit", "768 Bit", "1024 Bit"]
     x = np.arange(len(versions)) # creates [0, 1, 2 ...]
     pyber_data, kyber_py_data = get_data(op)
-    w = 0.2 # bar width
+    w = 0.275 # bar width
 
-    bar_1 = ax.bar(x-w/2, width=w, height=pyber_data, label="Pyber", color=color_16)
-    bar_2 = ax.bar(x+w/2, width=w, height=kyber_py_data, label="Kyber-py", color=color_15)
+    bar_1 = ax.bar(x-w/2, width=w, height=pyber_data, label="Pyber", color=BLUE_LIGHT)
+    bar_2 = ax.bar(x+w/2, width=w, height=kyber_py_data, label="Kyber-py", color=BLUE_DARK)
 
     ax.bar_label(bar_1)
     ax.bar_label(bar_2)
     ax.set_xticks(x)
     ax.set_xticklabels(versions)
-    ax.set_title(f"{op}()")
+    ax.set_title(f"{op}()", fontsize=14)
     ax.yaxis.set_major_locator(plt.MultipleLocator(1))  # large steps
     ax.yaxis.set_minor_locator(plt.MultipleLocator(0.25)) # small steps
     ax.yaxis.grid(True, alpha=0.2)
     ax.set_axisbelow(True) # moves yaxis grid behind bars
 
-fig, (ax1, ax2, ax3) = plt.subplots(1, 3, sharey=True)
+plt.style.use('dark_background')
 plt.rcParams['font.family'] = 'monospace'
+fig, (ax1, ax2, ax3) = plt.subplots(1, 3, sharey=True, figsize=(16, 9))
+
+plt.subplots_adjust(
+    left=0.075, 
+    right=0.925, 
+    bottom=0.1, 
+    top=0.9
+    ) # x: plot[left -> right]
 
 plot("keygen", ax1)
 plot("encaps", ax2)
 plot("decaps", ax3)
 
-fig.suptitle(
-    f"pyber vs. kyber-py | Apple M1 | macOS | min of {RUN_AMOUNT} runs",
-    # y=0.95,
-    fontsize=20,
-    fontweight='bold'
-    )
 ax1.legend(loc='upper left')
-ax1.set_ylabel("ms")
+ax1.set_ylabel("ms", fontsize=14, labelpad=15)
 
-plt.tight_layout()
-plt.show()
+plt.subplots_adjust(left=0.075, right=0.925, bottom=0.1, top=0.9) # x: plot[left -> right]
+plt.savefig("assets/benchmark.png", dpi=200)
+# plt.show()
