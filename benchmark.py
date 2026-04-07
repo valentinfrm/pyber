@@ -104,7 +104,7 @@ def plot(op, ax):
     versions = ["512 Bit", "768 Bit", "1024 Bit"]
     x = np.arange(len(versions)) # creates [0, 1, 2 ...]
     pyber_data, kyber_py_data = get_data(op)
-    w = 0.275 # bar width
+    w = 0.225 # bar width
 
     bar_1 = ax.bar(x-w/2, width=w, height=pyber_data, label="Pyber", color=BLUE_LIGHT)
     bar_2 = ax.bar(x+w/2, width=w, height=kyber_py_data, label="Kyber-py", color=BLUE_DARK)
