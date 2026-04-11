@@ -19,7 +19,7 @@ uv sync
 ### Exposed functions in `kem.py`:
 
 - `keygen()`: generate a keypair (ek, dk)
-- `keygen_checked()` generate a keypair (ek, dk) with fault attack resistance
+- `keygen_checked()`: generate a keypair (ek, dk) with fault attack resistance
 - `encaps(ek)`: generate a key and ciphertext pair (key, c)
 - `decaps(dk, c)`: generate the symmetric key
 
@@ -42,7 +42,7 @@ assert symmetric_key == symmetric_key_dec
 
 ## Performance
 
-Fastest observed runtime over 20 runs on APPLE m1
+Fastest observed runtime over 20 runs on APPLE m1:
 
 ![benchmark](./assets/benchmarkARM.png)
 
